@@ -48,3 +48,7 @@ end
 gem 'pismo'
 gem 'twitter', '~> 5.15'
 gem 'bootstrap-sass', '~> 3.3', '>= 3.3.6'
+gem 'curb'
+gem 'matrix'
+gem 'narray'
+gem 'tf-idf-similarity'
