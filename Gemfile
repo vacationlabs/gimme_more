@@ -45,3 +45,6 @@ group :development do
   gem 'spring'
 end
 
+gem 'pismo'
+gem 'twitter', '~> 5.15'
+gem 'bootstrap-sass', '~> 3.3', '>= 3.3.6'
