@@ -1,3 +1,5 @@
 == README
 
-App to search Di-similar articles on web.
+An application to search for articles on the same topic with different content.
+
+Just input the link to the article, and it shows you articles with newer and different content.
