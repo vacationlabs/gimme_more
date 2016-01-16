@@ -25,12 +25,30 @@ class Recommendation < ActiveRecord::Base
     puts "Found #{related_pages.count}"
 
     # computing similarity
-    corpus = related_pages.collect{|page| TfIdfSimilarity::Document.new(page.body)}
-    model = TfIdfSimilarity::TfIdfModel.new(corpus)
-
+    corpus = (related_pages << doc).collect{|page| TfIdfSimilarity::Document.new(page.body)}
+    model = TfIdfSimilarity::TfIdfModel.new(corpus, :library => :narray)
     matrix = model.similarity_matrix
 
+    puts "similarity_matrix #{matrix.inspect}"
+    articles = self.find_di_similar(model, doc,related_pages)
+    puts "final di similar articles #{articles.inspect}"
+    return articles
+  end
 
+  def self.find_di_similar(model,article, related_pages, offset=0, limit=10)
+    matrix = model.similarity_matrix
+    result = []
+    related_pages.each do |page|
+      result.push({
+        :title => page.title,
+        :meta_description => page.description,
+        :url => page.url,
+        :similarity => matrix[model.document_index(article), model.document_index(page)]
+        })
+    end
+
+    result = result.collect{|item| item if item[:similarity] > 0 }
+    result.sort_by {|hash| hash[:similarity]}.reverse
   end
 
   def self.compute_similarity(master_url, slave_url)
@@ -61,7 +79,7 @@ class Recommendation < ActiveRecord::Base
 
   def self.search_for_tweet(text)
     # todo: stamming and remove stop words
-    self.get_twitter_client.search(text).take(10)
+    self.get_twitter_client.search(text).take(15)
   end
 
   def self.get_links_from_tweets(tweets)
@@ -69,7 +87,8 @@ class Recommendation < ActiveRecord::Base
   end
 
   def self.decode_twitter_urls(urls)
-    urls.collect{|url| get_redirected_url(url)}.flatten.compact.uniq
+    # urls.collect{|url| get_redirected_url(url)}.flatten.compact.uniq
+    urls.collect{|url| Url.find_twitter_url_or_add(url) }.flatten.compact.uniq
     # (urls || []).reduce([]) do |memo, url|
       # memo.push get_redirected_url url
     # end

@@ -11,12 +11,19 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160116100339) do
+ActiveRecord::Schema.define(version: 20160116115618) do
 
   create_table "recommendations", force: :cascade do |t|
     t.text     "url"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "urls", force: :cascade do |t|
+    t.text     "twitter_uri"
+    t.text     "url"
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
   end
 
 end
